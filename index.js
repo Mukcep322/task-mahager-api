@@ -2,11 +2,15 @@ import express from 'express';
 import swaggerJsdoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
 import dotenv from 'dotenv';
+
 import { PrismaClient } from '@prisma/client';
 import { auth } from './middleware/auth.js';
 import { errorHandler } from './middleware/errorHandler.js';
 import { authController } from './controllers/authController.js';
 import { taskController } from './controllers/taskController.js';
+
+import {validateRegister, validateLogin} from './validators/authValidator.js'
+import {validateCreateTask, validateTaskId, validateUpdateTask} from './validators/taskValidator.js'
 
 dotenv.config();
 
@@ -48,16 +52,16 @@ app.get('/ping', (req, res) => {
 });
 
 // ========== AUTH ROUTES ==========
-app.post('/register', authController.register);
-app.post('/login', authController.login);
+app.post('/register',validateRegister, authController.register);
+app.post('/login',validateLogin, authController.login);
 app.get('/me', auth, authController.getMe);
 
 // ========== TASK ROUTES ==========
 app.get('/tasks', auth, taskController.getAll);
-app.get('/tasks/:id', auth, taskController.getById);
-app.post('/tasks', auth, taskController.create);
-app.put('/tasks/:id', auth, taskController.update);
-app.delete('/tasks/:id', auth, taskController.delete);
+app.get('/tasks/:id', auth, validateTaskId,taskController.getById);
+app.post('/tasks', auth, validateCreateTask, taskController.create);
+app.put('/tasks/:id', auth, validateUpdateTask, taskController.update);
+app.delete('/tasks/:id', auth, validateTaskId, taskController.delete);
 
 // ========== ERROR HANDLER ==========
 app.use(errorHandler);
@@ -66,17 +70,17 @@ app.use(errorHandler);
 const PORT = process.env.PORT || 3000;
 
 const server = app.listen(PORT, () => {
-  console.log(`🚀 Server running on http://localhost:${PORT}`);
-  console.log(`📚 Swagger docs: http://localhost:${PORT}/api-docs`);
-  console.log(`🏓 Health check: http://localhost:${PORT}/ping`);
+  console.log(`Server running on http://localhost:${PORT}`);
+  console.log(`Swagger docs: http://localhost:${PORT}/api-docs`);
+  console.log(`Health check: http://localhost:${PORT}/ping`);
 });
 
 // Graceful shutdown
 process.on('SIGINT', async () => {
-  console.log('\n🛑 Shutting down...');
+  console.log('\n Shutting down...');
   await prisma.$disconnect();
   server.close(() => {
-    console.log('✅ Server stopped');
+    console.log('Server stopped');
     process.exit(0);
   });
 });
