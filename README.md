@@ -382,16 +382,6 @@ npm run test:coverage
 
 ---
 
-## 🤝 Contributing
-
-1. Форкните репозиторий
-2. Создайте ветку для фичи (`git checkout -b feature/amazing`)
-3. Закоммитьте изменения (`git commit -m 'Add amazing feature'`)
-4. Запушьте ветку (`git push origin feature/amazing`)
-5. Откройте Pull Request
-
----
-
 ## 📄 License
 
 MIT © [Mukcep322](https://github.com/Mukcep322)
